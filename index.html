@@ -1,0 +1,106 @@
+<html>
+ <head>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+     <style>
+            .container {
+              height: 200px;
+              position: relative;
+            }
+            
+            .vertical-center {
+              margin: 0;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              -ms-transform: translate(-50%, -50%);
+              transform: translate(-50%, -50%);
+            }
+            
+            .horizontal-center {
+              margin: 0;
+              position: absolute;
+              left: 50%;
+              -ms-transform: translate(-50%, 0);
+              transform: translate(-50%, 0);
+            }
+            
+            .center {
+             display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 200px;
+            }
+            label {
+              display: inline-block;
+              width: 140px;
+              text-align: right;
+            }
+        </style>
+ </head>
+ <body>
+    <script src="https://www.puck-js.com/puck.js"></script>
+    <h1>Nanosensor for Food Quality</h1>
+    <div style="margin:20">
+        <button onclick="Puck.eval('ledON();\n')">test Eval!</button>
+        <button onclick="Puck.eval('getData()', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button>
+    </div>
+    <div class="block" style="margin:20">
+            <button onclick="myInterval = setInterval(myTimer, 1000);">start data log</button>
+            <button onclick="clearInterval(myInterval);">stop data log</button>
+            <br>
+            </div>
+            <div class="block" style="margin:10">
+                <label>Sensor signal :</label><input id="sensor_data" type="text" value="0" disabled>
+            </div>
+        
+    
+    <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+    
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+</script>
+<script>
+const max_points = 1000;
+var xi=-1;
+
+var myChart = new Chart("myChart", {
+  type: "line",
+  data: {
+    datasets: [{
+      pointRadius: 4,
+      pointBackgroundColor: "rgb(0,0,255)",
+      data: []
+    }]
+  },
+  options: {
+    legend: {display: false},
+    scales: {
+      //xAxes: [{ticks: {min: 40, max:160}}],
+      //yAxes: [{ticks: {min: 6, max:16}}],
+    }
+  }
+});
+
+function addData(chart, label, newData) {
+    chart.data.labels.push(newData.x);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(newData.y);
+        if (dataset.data.length > max_points){
+            dataset.data.shift();
+        }
+    });
+    chart.update();
+}
+
+function myTimer() {
+          Puck.eval('getData()', function(d) {
+              document.getElementById('sensor_data').value=d;
+              xi = xi + 1;
+              //xyValues.push({x:xi,y:Number(d)});
+              addData(myChart, [], {x:xi,y:Number(d)});
+          });
+        }
+</script>
+
+ </body>
+</html>
