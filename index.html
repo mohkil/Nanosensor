@@ -80,8 +80,6 @@ var myChart = new Chart("myChart", {
   options: {
     legend: {display: false},
     scales: {
-      //xAxes: [{ticks: {min: 40, max:160}}],
-      //yAxes: [{ticks: {min: 6, max:16}}],
      x: {
         title: {
           color: 'black',
@@ -90,6 +88,7 @@ var myChart = new Chart("myChart", {
         }
       },
      y: {
+        type: 'logarithmic',
         title: {
           color: 'black',
           display: true,
