@@ -82,6 +82,20 @@ var myChart = new Chart("myChart", {
     scales: {
       //xAxes: [{ticks: {min: 40, max:160}}],
       //yAxes: [{ticks: {min: 6, max:16}}],
+     x: {
+        title: {
+          color: 'black',
+          display: true,
+          text: 'Time (s)'
+        },
+      }
+     y: {
+        title: {
+          color: 'black',
+          display: true,
+          text: 'Ammonia concentration (ppm)'
+        }
+      }
     }
   }
 });
