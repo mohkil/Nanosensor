@@ -39,7 +39,7 @@
  </head>
  <body>
     <script src="https://www.puck-js.com/puck.js"></script>
-    <h1>Nanosensor for Food Quality</h1>
+    <h1>Nanosensor for Safety Monitoring</h1>
     <div style="margin:20">
         <button onclick="Puck.eval('ledON();\n')">test Eval!</button>
         <button onclick="Puck.eval('getData()', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button>
@@ -84,7 +84,8 @@ var myChart = new Chart("myChart", {
 function addData(chart, label, newData) {
     chart.data.labels.push(newData.x);
     chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(newData.y);
+     let shifted_y = newData.y * 40 / 0.01 - 0.9;
+        dataset.data.push(shifted_y);
         if (dataset.data.length > max_points){
             dataset.data.shift();
         }
