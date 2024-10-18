@@ -58,8 +58,14 @@
              <label>c :</label><input id="c" type="text" value="100">
             </div>
         
-    
-    <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+    <div class="block" style="margin:10">
+
+    	<canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+<div style="transform: rotate(-90deg); transform-origin: left bottom;">
+  <h3 style="margin-left:100">Ammonia Concentration (ppm)</h3>
+</div>
+	<h3 style="margin-left:25%">Time (s)</h3>
+</div>
     
 <script
 src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
@@ -68,7 +74,9 @@ src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 const max_points = 1000;
 var xi=-1;
 
-var myChart = new Chart("myChart", {
+var ctx = document.getElementById("myChart").getContext("2d");
+
+var myChart = new Chart(ctx, {
   type: "line",
   data: {
     datasets: [{
@@ -80,19 +88,30 @@ var myChart = new Chart("myChart", {
   options: {
     legend: {display: false},
     scales: {
-     x: {
+      x: {
         title: {
-          color: 'black',
           display: true,
-          text: 'Time (s)'
+          text: 'Time (s)',
+          color: 'black',
+          font: {
+            size: 14 // You can adjust the font size if needed
+          }
+        },
+        ticks: {
+          beginAtZero: true
         }
       },
-     y: {
-        type: 'logarithmic',
+      y: {
         title: {
-          color: 'black',
           display: true,
-          text: 'Ammonia concentration (ppm)'
+          text: 'Ammonia concentration (ppm)',
+          color: 'black',
+          font: {
+            size: 14 // You can adjust the font size if needed
+          }
+        },
+        ticks: {
+          beginAtZero: true
         }
       }
     }
