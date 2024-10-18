@@ -52,6 +52,11 @@
             <div class="block" style="margin:10">
                 <label>Sensor signal :</label><input id="sensor_data" type="text" value="0" disabled>
             </div>
+            <div class="block" style="margin:10">
+             <label>a :</label><input id="a" type="text" value="0.9">
+             <label>b :</label><input id="b" type="text" value="0.01">
+             <label>c :</label><input id="c" type="text" value="100">
+            </div>
         
     
     <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
@@ -84,7 +89,10 @@ var myChart = new Chart("myChart", {
 function addData(chart, label, newData) {
     chart.data.labels.push(newData.x);
     chart.data.datasets.forEach((dataset) => {
-     let shifted_y = (newData.y - 0.9) / 0.01 * 40;
+     let a = document.getElementById('a').value;
+     let b = document.getElementById('b').value;
+     let c = document.getElementById('c').value;
+     let shifted_y = (newData.y - a) / b * c;
         dataset.data.push(shifted_y);
         if (dataset.data.length > max_points){
             dataset.data.shift();
