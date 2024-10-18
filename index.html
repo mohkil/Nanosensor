@@ -69,6 +69,7 @@
              <label>b :</label><input id="b" type="text" value="0.01">
              <label>c :</label><input id="c" type="text" value="100">
             </div>
+<button onclick="clearData();">Restart</button>
 	 </div>
 	 
 <script
@@ -112,10 +113,10 @@ var myChart = new Chart(ctx, {
           color: 'black',
           font: {
             size: 14 // You can adjust the font size if needed
-          }
-        },
-        ticks: {
-          beginAtZero: true
+          },
+        //ticks: {
+          //beginAtZero: true
+        //}
         }
       }
     }
@@ -145,6 +146,19 @@ function myTimer() {
               addData(myChart, [], {x:xi,y:Number(d)});
           });
         }
+
+function clearData() {
+	// Assuming 'myChart' is your chart instance
+	myChart.data.datasets.forEach((dataset) => {
+  		dataset.data = []; // Clear the data
+	});
+
+	// Optionally, you can also clear the labels if necessary:
+	myChart.data.labels = [];
+
+	// Update the chart to reflect the changes
+	myChart.update();
+  }
 </script>
 
  </body>
