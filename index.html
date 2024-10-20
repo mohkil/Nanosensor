@@ -41,8 +41,9 @@
     <script src="https://www.puck-js.com/puck.js"></script>
     <h1>Nanosensor for Safety Monitoring</h1>
     <div style="margin:20">
-        <button onclick="Puck.eval('ledON();\n')">test Eval!</button>
-        <button onclick="Puck.eval('getData()', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button>
+        <button onclick="Puck.eval('digitalWrite(LED1, 1), setInterval(function() {  digitalWrite(LED1, 0) }, 1000)')">test Eval!</button>
+        <!-- button onclick="Puck.eval('getData()', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button -->
+	<button onclick="Puck.eval('analogRead(D31)', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button>
     </div>
     <div class="block" style="margin:20">
             <button onclick="myInterval = setInterval(myTimer, 1000);">start data log</button>
@@ -65,17 +66,22 @@
 
 	 <div style="margin-top:1000">
 	<div class="block" style="margin:10">
-             <label>a :</label><input id="a" type="text" value="0.9">
-             <label>b :</label><input id="b" type="text" value="0.01">
-             <label>c :</label><input id="c" type="text" value="100">
+             <label>a :</label><input id="a" type="number" value="0.6"><br>
+             <label>b :</label><input id="b" type="number" value="0.05"><br>
+             <label>c :</label><input id="c" type="number" value="100"><br>
+	     <label>smoothing degree - alpha :</label><input id="alpha" type="number" value="0.7" min="0" max="0.999999"><br>
             </div>
-<button onclick="clearData();">Restart</button>
+	<button onclick="clearData();">Restart</button>
 	 </div>
 	 
 <script
 src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
 </script>
 <script>
+
+//var real_time_data = [];
+//var ma_data = [];
+
 const max_points = 1000;
 var xi=-1;
 
@@ -85,13 +91,21 @@ var myChart = new Chart(ctx, {
   type: "line",
   data: {
     datasets: [{
+	label: 'real-time',
       pointRadius: 4,
       pointBackgroundColor: "rgb(0,0,255)",
       data: []
-    }]
+    },{
+	label: 'smoothed',
+      pointRadius: 4,
+	borderColor: 'rgb(75, 192, 192)',
+      pointBackgroundColor: "rgb(0,255,255)",
+      data: []
+    }
+]
   },
   options: {
-    legend: {display: false},
+    legend: {display: true, position: 'right'},
     scales: {
       x: {
         title: {
@@ -123,23 +137,53 @@ var myChart = new Chart(ctx, {
   }
 });
 
+
+const average = array => array.reduce((a, b) => a + b) / array.length;
+
+let smoothedValue = 0;
+
+function exp_smooth(newDataPoint, smoothedV, alpha) {
+    return (1 - alpha) * newDataPoint + alpha * smoothedV
+} 
+
 function addData(chart, label, newData) {
     chart.data.labels.push(newData.x);
-    chart.data.datasets.forEach((dataset) => {
+    //chart.data.datasets.forEach((dataset) => {
      let a = document.getElementById('a').value;
      let b = document.getElementById('b').value;
      let c = document.getElementById('c').value;
      let shifted_y = (newData.y - a) / b * c;
-        dataset.data.push(shifted_y);
-        if (dataset.data.length > max_points){
-            dataset.data.shift();
-        }
-    });
+     chart.data.datasets[0].data.push(shifted_y);
+        //if (dataset.data.length > max_points){
+            //dataset.data.shift();
+        //}
+    //});
+	//let arr = chart.data.datasets[0].data;
+	//let arr2 = arr.slice(Math.max(arr.length - 2, 0));
+	//chart.data.datasets[1].data.push(exp_smooth(arr2));
+	//console.log(average(arr2));
+	//console.log(exp_smooth(arr2));
+	
+	let l0 = chart.data.datasets[0].data.length
+	let l1 = chart.data.datasets[1].data.length
+	smoothedValue = shifted_y;
+	let alpha = document.getElementById('alpha').value;
+	//console.log('alpha',alpha)
+	if (l1 > 0) {
+		smoothedValue = alpha * chart.data.datasets[1].data[l1-1] + (1 - alpha) * chart.data.datasets[0].data[l0-1];
+	}
+	
+	chart.data.datasets[1].data.push(smoothedValue)
+	//console.log('smoothedArray',chart.data.datasets[1].data)
+
+	
     chart.update();
+	
 }
 
 function myTimer() {
-          Puck.eval('getData()', function(d) {
+          //Puck.eval('getData()', function(d) {
+	Puck.eval('analogRead(D31)', function(d) {
               document.getElementById('sensor_data').value=d;
               xi = xi + 1;
               //xyValues.push({x:xi,y:Number(d)});
