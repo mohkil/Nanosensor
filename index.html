@@ -40,31 +40,29 @@
  <body>
     <script src="https://www.puck-js.com/puck.js"></script>
     <h1>Nanosensor for Safety Monitoring</h1>
-    <div style="margin:20">
-        <button onclick="Puck.eval('digitalWrite(LED1, 1), setInterval(function() {  digitalWrite(LED1, 0) }, 1000)')">test Eval!</button>
-        <!-- button onclick="Puck.eval('getData()', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button -->
-	<button onclick="Puck.eval('analogRead(D31)', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button>
-    </div>
+    
     <div class="block" style="margin:20">
             <button onclick="myInterval = setInterval(myTimer, 1000);">start data log</button>
             <button onclick="clearInterval(myInterval);">stop data log</button>
             <br>
             </div>
-            <div class="block" style="margin:10">
-                <label>Sensor signal :</label><input id="sensor_data" type="text" value="0" disabled>
-            </div>
+
 
         
     <div class="block" style="margin:10">
 
     	<canvas id="myChart" style="width:100%;max-width:700px"></canvas>
-<div style="transform: rotate(-90deg); transform-origin: left bottom;">
-  <h3 style="margin-left:100">Ammonia Concentration (ppm)</h3>
-</div>
-	<h3 style="margin-left:25%">Time (s)</h3>
-</div>
 
-	 <div style="margin-top:1000">
+
+	 <div style="margin-top:600">
+<div style="margin:20">
+        <button onclick="Puck.eval('digitalWrite(LED1, 1), setInterval(function() {  digitalWrite(LED1, 0) }, 1000)')">test Eval!</button>
+        <!-- button onclick="Puck.eval('getData()', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button -->
+	<button onclick="Puck.eval('analogRead(D31)', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button>
+    </div>
+<div class="block" style="margin:10">
+                <label>Sensor signal :</label><input id="sensor_data" type="text" value="0" disabled>
+            </div>
 	<div class="block" style="margin:10">
              <label>a :</label><input id="a" type="number" value="0.6"><br>
              <label>b :</label><input id="b" type="number" value="0.05"><br>
@@ -75,7 +73,7 @@
 	 </div>
 	 
 <script
-src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+src="https://cdn.jsdelivr.net/npm/chart.js">
 </script>
 <script>
 
@@ -90,22 +88,29 @@ var ctx = document.getElementById("myChart").getContext("2d");
 var myChart = new Chart(ctx, {
   type: "line",
   data: {
-    datasets: [{
-	label: 'real-time',
-      pointRadius: 4,
-      pointBackgroundColor: "rgb(0,0,255)",
-      data: []
-    },{
-	label: 'smoothed',
-      pointRadius: 4,
-	borderColor: 'rgb(75, 192, 192)',
-      pointBackgroundColor: "rgb(0,255,255)",
-      data: []
-    }
-]
+    datasets: [
+      {
+        label: 'real-time',
+        pointRadius: 4,
+        pointBackgroundColor: "rgb(0,0,255)",
+        data: []  // Data for the real-time dataset
+      },
+      {
+        label: 'smoothed',
+        pointRadius: 4,
+        borderColor: 'rgb(75, 192, 192)',  // Line color for smoothed data
+        pointBackgroundColor: "rgb(0,255,255)",
+        data: []  // Data for the smoothed dataset
+      }
+    ]
   },
   options: {
-    legend: {display: true, position: 'right'},
+    plugins: {
+      legend: {
+        display: true,
+        position: 'right'  // Legend placement
+      }
+    },
     scales: {
       x: {
         title: {
@@ -113,31 +118,30 @@ var myChart = new Chart(ctx, {
           text: 'Time (s)',
           color: 'black',
           font: {
-            size: 14 // You can adjust the font size if needed
+            size: 14 // Adjusted font size for the X-axis title
           }
-        },
-        ticks: {
-          beginAtZero: true
         }
       },
       y: {
+        suggestedMin: 0,  // Minimum value for Y-axis
+        suggestedMax: 250,  // Maximum value for Y-axis
         title: {
           display: true,
           text: 'Ammonia concentration (ppm)',
           color: 'black',
           font: {
-            size: 14 // You can adjust the font size if needed
-          },
-        //ticks: {
-          //beginAtZero: true
-        //}
+            size: 14  // Adjusted font size for the Y-axis title
+          }
+        },
+        ticks: {
+          beginAtZero: true  // Ensure Y-axis begins at zero
         }
       }
     }
   }
 });
 
-
+console.log(myChart.options)
 const average = array => array.reduce((a, b) => a + b) / array.length;
 
 let smoothedValue = 0;
@@ -176,7 +180,8 @@ function addData(chart, label, newData) {
 	chart.data.datasets[1].data.push(smoothedValue)
 	//console.log('smoothedArray',chart.data.datasets[1].data)
 
-	
+	chart.options.scales.y.max = 250;
+	chart.options.scales.y.min = 0;
     chart.update();
 	
 }
@@ -196,6 +201,9 @@ function clearData() {
 	myChart.data.datasets.forEach((dataset) => {
   		dataset.data = []; // Clear the data
 	});
+
+	myChart.options.scales.y.max = 250;
+	myChart.options.scales.y.min = 0;
 
 	// Optionally, you can also clear the labels if necessary:
 	myChart.data.labels = [];
