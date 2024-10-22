@@ -164,6 +164,7 @@
 
         <div>
             <label>Sensor Signal:</label><input id="sensor_data" type="text" value="0" disabled>
+			<label>Sampling Time (ms):</label><input id="samplingTime" type="number" value="1000" min="500" max="10000"><br>
         </div>
 
         <div>
@@ -290,10 +291,12 @@
 
 
         // Start and stop data logging
+		
+		let samplingTime = document.getElementById('samplingTime').value;
         function startDataLog() {
             document.getElementById('startLogButton').disabled = true;
             document.getElementById('stopLogButton').disabled = false;
-			myInterval = setInterval(myTimer, 500);
+			myInterval = setInterval(myTimer, samplingTime);
             console.log("Data logging started.");
         }
 
