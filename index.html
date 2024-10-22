@@ -2,216 +2,446 @@
  <head>
      <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
      <style>
-            .container {
-              height: 200px;
-              position: relative;
-            }
-            
-            .vertical-center {
-              margin: 0;
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              -ms-transform: translate(-50%, -50%);
-              transform: translate(-50%, -50%);
-            }
-            
-            .horizontal-center {
-              margin: 0;
-              position: absolute;
-              left: 50%;
-              -ms-transform: translate(-50%, 0);
-              transform: translate(-50%, 0);
-            }
-            
-            .center {
-             display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 200px;
-            }
-            label {
-              display: inline-block;
-              width: 140px;
-              text-align: right;
-            }
-        </style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #F5F7FA; /* Light Gray Background */
+          color: #34495E; /* Dark Grayish Blue Text */
+          transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme switch */
+        }
+
+        h1 {
+          color: #2D3E50; /* Dark Slate Blue */
+          text-align: center;
+          margin-bottom: 40px;
+          transition: color 0.3s; /* Transition for dark mode */
+        }
+
+        .block {
+          margin: 20px;
+          padding: 20px;
+          background-color: #ffffff; /* White background for blocks */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          border-radius: 10px;
+          transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for theme switch */
+        }
+
+        button {
+          background-color: #1ABC9C; /* Teal Button */
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          text-align: center;
+          font-size: 14px;
+          margin: 10px;
+          cursor: pointer;
+          border-radius: 5px;
+          transition: background-color 0.3s; /* Smooth transition for theme switch */
+        }
+
+        button:hover {
+          background-color: #16A085; /* Darker Teal on Hover */
+        }
+
+        label {
+          color: #2D3E50; /* Dark Slate Blue for Labels */
+          font-weight: bold;
+          display: inline-block;
+          width: 180px;
+          margin-bottom: 10px;
+          transition: color 0.3s; /* Transition for dark mode */
+        }
+
+        input[type="number"], input[type="text"] {
+          padding: 5px;
+          margin: 5px;
+          border: 1px solid #BDC3C7; /* Light Gray border */
+          border-radius: 5px;
+          width: 120px;
+          transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for theme switch */
+        }
+
+        canvas {
+          margin-top: 40px;
+          display: block;
+          margin-left: 20px;
+          margin-right: 20px;
+          max-width: 100%;
+		  //min-height: 70%;
+          height: 50%;
+        }
+        
+        .container {
+          text-align: center;
+        }
+
+        .block-inline {
+          display: inline-block;
+        }
+
+        /* Dark mode styles */
+        .dark-mode {
+          background-color: #1E272E; /* Dark background */
+          color: #F1F1F1; /* Light text */
+        }
+
+        .dark-mode h1 {
+          color: #F1F1F1; /* Light text for headers */
+        }
+
+        .dark-mode .block {
+          background-color: #2F3640; /* Dark block background */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Darker shadow */
+        }
+
+        .dark-mode button {
+          background-color: #3498DB; /* Blue button for dark mode */
+        }
+
+        .dark-mode button:hover {
+          background-color: #2980B9; /* Darker blue on hover */
+        }
+
+        .dark-mode input[type="number"], .dark-mode input[type="text"] {
+          background-color: #34495E; /* Dark input background */
+          color: #F1F1F1; /* Light text in inputs */
+          border-color: #95A5A6; /* Gray border for inputs */
+        }
+
+        .dark-mode label {
+          color: #F1F1F1; /* Light label text in dark mode */
+        }
+
+        /* Collapsible section */
+        .collapsible-section {
+          display: none;
+          overflow: hidden;
+          transition: max-height 0.3s ease-out;
+        }
+
+        .arrow-button {
+          background-color: transparent;
+          border: none;
+          font-size: 20px;
+          cursor: pointer;
+        }
+
+        .arrow-button:hover {
+          color: #16A085;
+        }
+
+        /* Container for buttons above chart */
+        .button-container {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+
+     </style>
  </head>
  <body>
     <script src="https://www.puck-js.com/puck.js"></script>
-    <h1>Nanosensor for Safety Monitoring</h1>
     
-    <div class="block" style="margin:20">
-            <button onclick="myInterval = setInterval(myTimer, 1000);">start data log</button>
-            <button onclick="clearInterval(myInterval);">stop data log</button>
-            <br>
-            </div>
+    <h1>Nanosensor for Safety Monitoring</h1>
 
-
-        
-    <div class="block" style="margin:10">
-
-    	<canvas id="myChart" style="width:100%;max-width:700px"></canvas>
-
-
-	 <div style="margin-top:600">
-<div style="margin:20">
-        <button onclick="Puck.eval('digitalWrite(LED1, 1), setInterval(function() {  digitalWrite(LED1, 0) }, 1000)')">test Eval!</button>
-        <!-- button onclick="Puck.eval('getData()', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button -->
-	<button onclick="Puck.eval('analogRead(D31)', function(d) {document.getElementById('sensor_data').value=d;});">get data!</button>
+    <!-- Button container on top of the chart -->
+    <div class="button-container">
+        <button id="startLogButton" onclick="startDataLog()">Start Data Log</button>
+        <button id="stopLogButton" onclick="stopDataLog()" disabled>Stop Data Log</button>
     </div>
-<div class="block" style="margin:10">
-                <label>Sensor signal :</label><input id="sensor_data" type="text" value="0" disabled>
-            </div>
-	<div class="block" style="margin:10">
-             <label>a :</label><input id="a" type="number" value="0.6"><br>
-             <label>b :</label><input id="b" type="number" value="0.05"><br>
-             <label>c :</label><input id="c" type="number" value="100"><br>
-	     <label>smoothing degree - alpha :</label><input id="alpha" type="number" value="0.7" min="0" max="0.999999"><br>
-            </div>
-	<button onclick="clearData();">Restart</button>
-	 </div>
-	 
-<script
-src="https://cdn.jsdelivr.net/npm/chart.js">
-</script>
-<script>
 
-//var real_time_data = [];
-//var ma_data = [];
+    <div class="block container">
+        <canvas id="myChart"></canvas>
+    </div>
 
-const max_points = 1000;
-var xi=-1;
+    <div class="container">
+        <button class="arrow-button" onclick="toggleCollapsible()">▼</button>
+    </div>
 
-var ctx = document.getElementById("myChart").getContext("2d");
+    <div class="block container collapsible-section" id="collapsibleContent">
+        <button onclick="Puck.eval('digitalWrite(LED1, 1), setInterval(function() {  digitalWrite(LED1, 0) }, 1000)')">Test Eval!</button>
+        <button onclick="Puck.eval('analogRead(D31)', function(d) {document.getElementById('sensor_data').value=d;});">Get Data!</button>
+		<button id="downloadBtn">Save to CSV</button>
+		<button id="toggleBtn">Toggle Dataset</button>
 
-var myChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    datasets: [
-      {
-        label: 'real-time',
-        pointRadius: 4,
-        pointBackgroundColor: "rgb(0,0,255)",
-        data: []  // Data for the real-time dataset
-      },
-      {
-        label: 'smoothed',
-        pointRadius: 4,
-        borderColor: 'rgb(75, 192, 192)',  // Line color for smoothed data
-        pointBackgroundColor: "rgb(0,255,255)",
-        data: []  // Data for the smoothed dataset
-      }
-    ]
-  },
-  options: {
-    plugins: {
-      legend: {
-        display: true,
-        position: 'right'  // Legend placement
-      }
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Time (s)',
-          color: 'black',
-          font: {
-            size: 14 // Adjusted font size for the X-axis title
+        <div>
+            <label>Sensor Signal:</label><input id="sensor_data" type="text" value="0" disabled>
+        </div>
+
+        <div>
+            <label>a:</label><input id="a" type="number" value="0.5"><br>
+            <label>b:</label><input id="b" type="number" value="0.1"><br>
+            <label>c:</label><input id="c" type="number" value="2000"><br>
+            <label>Smoothing Degree (Alpha):</label><input id="alpha" type="number" value="0.8" min="0" max="0.999999"><br>
+        </div>
+
+        <button onclick="clearData();">Restart</button>
+        <br>
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+
+            // Adjust chart colors when dark mode is on
+            let darkModeOn = document.body.classList.contains("dark-mode");
+
+            let chartColors = {
+                background: darkModeOn ? '#1C1C1CC3' : '#4BC0C033',
+                border: darkModeOn ? '#3498DB' : '#1ABC9C',
+                pointBorder: darkModeOn ? '#ECF0F1' : '#2D3E50',
+                gridColor: darkModeOn ? '#A0A0A0' : '#34495E',
+                textColor: darkModeOn ? '#ECF0F1' : '#34495E',
+            };
+
+            myChart.options.scales.x.title.color = chartColors.textColor;
+            myChart.options.scales.y.title.color = chartColors.textColor;
+            myChart.options.scales.x.ticks.color = chartColors.textColor;
+            myChart.options.scales.y.ticks.color = chartColors.textColor;
+			myChart.options.scales.x.grid.color = chartColors.gridColor;
+			myChart.options.scales.y.grid.color = chartColors.gridColor;
+
+            myChart.data.datasets.forEach(dataset => {
+                dataset.borderColor = chartColors.border;
+                dataset.backgroundColor = chartColors.background;
+            });
+
+            myChart.update();
+        }
+
+        // Toggle collapsible section
+        function toggleCollapsible() {
+            var content = document.getElementById("collapsibleContent");
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+
+        // Chart setup
+        var ctx = document.getElementById("myChart").getContext("2d");
+
+        var myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            datasets: [
+              {
+                label: 'Sensor data',
+                pointRadius: 4,
+                pointBackgroundColor: "rgb(0,0,255)",
+				tension: 0.4,  // Set tension for smoothing
+                data: []  // Data for the real-time dataset
+              },
+              {
+                label: 'Sensor data',
+                pointRadius: 4,
+                borderColor: 'rgb(75, 192, 192)',  // Line color for smoothed data
+				backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Light blue background fill
+                fill: true,  // Enables filling under the line
+                pointBackgroundColor: "rgb(0,255,255)",
+				tension: 0.4,  // Set tension for smoothing
+                data: []  // Data for the smoothed dataset
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,  // Allow the chart to adjust its aspect ratio
+            plugins: {
+              legend: {
+                display: false,
+                position: 'right'  // Legend placement
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time (s)',
+                  color: '#34495E',  // Default axis title color
+                  font: {
+                    size: 14  // Adjusted font size for the X-axis title
+                  }
+                },
+                ticks: {
+				//display: true,
+                  color: '#34495E'  // Default axis tick color
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Signal',
+                  color: '#34495E',  // Default axis title color
+                  font: {
+                    size: 14  // Adjusted font size for the Y-axis title
+                  }
+                },
+                ticks: {
+				display: false,
+                  color: '#34495E'  // Default axis tick color
+                }
+              }
+            }
           }
-        }
-      },
-      y: {
-        suggestedMin: 0,  // Minimum value for Y-axis
-        suggestedMax: 250,  // Maximum value for Y-axis
-        title: {
-          display: true,
-          text: 'Ammonia concentration (ppm)',
-          color: 'black',
-          font: {
-            size: 14  // Adjusted font size for the Y-axis title
-          }
-        },
-        ticks: {
-          beginAtZero: true  // Ensure Y-axis begins at zero
-        }
-      }
-    }
-  }
-});
+        });
 
-console.log(myChart.options)
-const average = array => array.reduce((a, b) => a + b) / array.length;
 
-let smoothedValue = 0;
-
-function exp_smooth(newDataPoint, smoothedV, alpha) {
-    return (1 - alpha) * newDataPoint + alpha * smoothedV
-} 
-
-function addData(chart, label, newData) {
-    chart.data.labels.push(newData.x);
-    //chart.data.datasets.forEach((dataset) => {
-     let a = document.getElementById('a').value;
-     let b = document.getElementById('b').value;
-     let c = document.getElementById('c').value;
-     let shifted_y = (newData.y - a) / b * c;
-     chart.data.datasets[0].data.push(shifted_y);
-        //if (dataset.data.length > max_points){
-            //dataset.data.shift();
-        //}
-    //});
-	//let arr = chart.data.datasets[0].data;
-	//let arr2 = arr.slice(Math.max(arr.length - 2, 0));
-	//chart.data.datasets[1].data.push(exp_smooth(arr2));
-	//console.log(average(arr2));
-	//console.log(exp_smooth(arr2));
-	
-	let l0 = chart.data.datasets[0].data.length
-	let l1 = chart.data.datasets[1].data.length
-	smoothedValue = shifted_y;
-	let alpha = document.getElementById('alpha').value;
-	//console.log('alpha',alpha)
-	if (l1 > 0) {
-		smoothedValue = alpha * chart.data.datasets[1].data[l1-1] + (1 - alpha) * chart.data.datasets[0].data[l0-1];
-	}
-	
-	chart.data.datasets[1].data.push(smoothedValue)
-	//console.log('smoothedArray',chart.data.datasets[1].data)
-
-	chart.options.scales.y.max = 250;
-	chart.options.scales.y.min = 0;
-    chart.update();
-	
-}
-
-function myTimer() {
-          //Puck.eval('getData()', function(d) {
-	Puck.eval('analogRead(D31)', function(d) {
-              document.getElementById('sensor_data').value=d;
-              xi = xi + 1;
-              //xyValues.push({x:xi,y:Number(d)});
-              addData(myChart, [], {x:xi,y:Number(d)});
-          });
+        // Start and stop data logging
+        function startDataLog() {
+            document.getElementById('startLogButton').disabled = true;
+            document.getElementById('stopLogButton').disabled = false;
+			myInterval = setInterval(myTimer, 500);
+            console.log("Data logging started.");
         }
 
-function clearData() {
-	// Assuming 'myChart' is your chart instance
-	myChart.data.datasets.forEach((dataset) => {
-  		dataset.data = []; // Clear the data
-	});
+        function stopDataLog() {
+            document.getElementById('startLogButton').disabled = false;
+            document.getElementById('stopLogButton').disabled = true;
+			clearInterval(myInterval);
+            console.log("Data logging stopped.");
+        }
 
-	myChart.options.scales.y.max = 250;
-	myChart.options.scales.y.min = 0;
+// Start and stop data logging
+		
+		const max_points = 1000;
+		var xi=-1;
+        const average = array => array.reduce((a, b) => a + b) / array.length;
 
-	// Optionally, you can also clear the labels if necessary:
-	myChart.data.labels = [];
+		let smoothedValue = 0;
 
-	// Update the chart to reflect the changes
-	myChart.update();
-  }
-</script>
+		function exp_smooth(newDataPoint, smoothedV, alpha) {
+			return (1 - alpha) * newDataPoint + alpha * smoothedV
+		} 
 
+		function addData(chart, label, newData) {
+			chart.data.labels.push(newData.x);
+			//chart.data.datasets.forEach((dataset) => {
+			 let a = document.getElementById('a').value;
+			 let b = document.getElementById('b').value;
+			 let c = document.getElementById('c').value;
+			 let shifted_y = (newData.y - a) / b * c;
+			 chart.data.datasets[0].data.push(shifted_y);
+				//if (dataset.data.length > max_points){
+					//dataset.data.shift();
+				//}
+			//});
+			//let arr = chart.data.datasets[0].data;
+			//let arr2 = arr.slice(Math.max(arr.length - 2, 0));
+			//chart.data.datasets[1].data.push(exp_smooth(arr2));
+			//console.log(average(arr2));
+			//console.log(exp_smooth(arr2));
+			
+			let l0 = chart.data.datasets[0].data.length
+			let l1 = chart.data.datasets[1].data.length
+			smoothedValue = shifted_y;
+			let alpha = document.getElementById('alpha').value;
+			//console.log('alpha',alpha)
+			if (l1 > 0) {
+				smoothedValue = alpha * chart.data.datasets[1].data[l1-1] + (1 - alpha) * chart.data.datasets[0].data[l0-1];
+			}
+			
+			chart.data.datasets[1].data.push(smoothedValue)
+			//console.log('smoothedArray',chart.data.datasets[1].data)
+
+			//chart.options.scales.y.max = 250;
+			//chart.options.scales.y.min = 0;
+			chart.update();
+			
+		}
+
+		function myTimer() {
+				  //Puck.eval('getData()', function(d) {
+			Puck.eval('analogRead(D31)', function(d) {
+					  document.getElementById('sensor_data').value=d;
+					  xi = xi + 1;
+					  //xyValues.push({x:xi,y:Number(d)});
+					  addData(myChart, [], {x:xi,y:Number(d)});
+				  });
+				}
+
+		function clearData() {
+			// Assuming 'myChart' is your chart instance
+			myChart.data.datasets.forEach((dataset) => {
+				dataset.data = []; // Clear the data
+			});
+
+			//myChart.options.scales.y.max = 250;
+			//myChart.options.scales.y.min = 0;
+
+			// Optionally, you can also clear the labels if necessary:
+			myChart.data.labels = [];
+
+			// Update the chart to reflect the changes
+			myChart.update();
+		  }
+		  
+		  
+		  
+		  // Function to convert chart data to CSV format
+		  function downloadCSV() {
+			const csvRows = [];
+			
+			// Get chart data
+			const labels = myChart.data.labels;
+			const datasets = myChart.data.datasets;
+
+			// Add headers
+			csvRows.push(['Time (s)', ...datasets.map(dataset => dataset.label)]);
+			
+			// Add data rows
+			labels.forEach((label, index) => {
+			  const row = [label];
+			  datasets.forEach(dataset => {
+				row.push(dataset.data[index] !== undefined ? dataset.data[index] : '');
+			  });
+			  csvRows.push(row);
+			});
+			
+			// Create a CSV string
+			const csvString = csvRows.map(row => row.join(',')).join('\n');
+			
+			// Create a blob and link for downloading
+			const blob = new Blob([csvString], { type: 'text/csv' });
+			const url = URL.createObjectURL(blob);
+			
+			// Get the current date and time for the filename
+			const now = new Date();
+			const formattedDate = now.toISOString().replace(/T/, '_').replace(/:/g, '-').split('.')[0]; // Format: YYYY-MM-DD_HH-MM-SS
+			const filename = `chart_data_${formattedDate}.csv`;
+
+			const a = document.createElement('a');
+			a.setAttribute('href', url);
+			a.setAttribute('download', filename);
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		  }
+
+		  // Add event listener to the download button
+		  document.getElementById('downloadBtn').addEventListener('click', downloadCSV);
+		  
+		  
+		  
+		   // Initialize a variable to keep track of the visibility state
+		  let isDatasetVisible = true;
+
+		  // Function to toggle the datasets visibility
+		  function toggleDatasets() {
+			isDatasetVisible = !isDatasetVisible; // Toggle the state
+
+			// Update the visibility of each dataset
+			myChart.data.datasets.forEach((dataset, index) => {
+			  dataset.hidden = (index === 0) ? !isDatasetVisible : false; // Hide the second dataset if toggled off
+			});
+
+			myChart.update(); // Update the chart to reflect changes
+		  }
+
+		  // Add event listener to the toggle button
+		  document.getElementById('toggleBtn').addEventListener('click', toggleDatasets);
+    </script>
  </body>
 </html>
